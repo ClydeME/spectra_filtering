@@ -1,0 +1,4 @@
+filter:
+  Telescope_Name: JWST
+  Instrument: NIRCam
+  Filter_ID: F070W
