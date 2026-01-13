@@ -14,7 +14,8 @@ from IPython.display import Image, display
 from tardis import run_tardis
 
 # Run the TARDIS Simulation
-sim = run_tardis("../../tardis_example.yml",
+config_file_path = "../../tardis_example.yml"
+sim = run_tardis(config_file_path,
                  virtual_packet_logging=True,
                  show_convergence_plots=False,
                  export_convergence_plots=False,
@@ -24,15 +25,6 @@ sim = run_tardis("../../tardis_example.yml",
 spectrum = sim.spectrum_solver.spectrum_real_packets
 spectrum_virtual = sim.spectrum_solver.spectrum_virtual_packets
 spectrum_integrated = sim.spectrum_solver.spectrum_integrated
-
-plt.figure()
-plt.plot(spectrum.wavelength, spectrum.luminosity_density_lambda)
-plt.plot(spectrum.wavelength, spectrum_virtual.luminosity_density_lambda)
-plt.plot(spectrum.wavelength, spectrum_integrated.luminosity_density_lambda)
-plt.xlabel("Wavelength (Angstrom)")
-plt.ylabel("Luminosity Density (erg/s/Angstrom)")
-plt.xlim(500, 12000)
-plt.title("Unfiltered TARDIS Example Model Spectrum")
 
 # Function to get Filter URL from TARDIS config file
 def get_url_from_config(config_file_path):
@@ -113,6 +105,18 @@ def interp_filter(spectrum_to_filter, filter_name):
     #Interpolate filter transmission values to match TARDIS Spectrum
     return np.interp(spectrum_to_filter, get_filter(filter_name)[0], get_filter(filter_name)[1])
 
+def plot_original_spectrum(spectrum, spectrum_virtual, spectrum_integrated):
+    # Plot TARDIS Spectrum before filtering
+    plt.figure()
+    plt.plot(spectrum.wavelength, spectrum.luminosity_density_lambda)
+    plt.plot(spectrum.wavelength, spectrum_virtual.luminosity_density_lambda)
+    plt.plot(spectrum.wavelength, spectrum_integrated.luminosity_density_lambda)
+    plt.xlabel("Wavelength (Angstrom)")
+    plt.ylabel("Luminosity Density (erg/s/Angstrom)")
+    plt.xlim(500, 12000)
+    plt.title("Unfiltered TARDIS Example Model Spectrum")
+
+
 def plot_filter(spectrum, chosen_filter):
     
     # Interpolate filter transmission values to match TARDIS Spectrum
@@ -142,5 +146,6 @@ def plot_filtered_spectrum(spectrum, spectrum_virtual, spectrum_integrated, chos
     plt.title("Filtered TARDIS Example Model Spectrum")
     plt.show()
 
+plot_original_spectrum(spectrum, spectrum_virtual, spectrum_integrated)
 plot_filter(spectrum, chosen_filter)
 plot_filtered_spectrum(spectrum, spectrum_virtual, spectrum_integrated, chosen_filter)
