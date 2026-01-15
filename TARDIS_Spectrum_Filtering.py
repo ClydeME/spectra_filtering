@@ -13,19 +13,6 @@ from astropy import units as u
 from IPython.display import Image, display
 from tardis import run_tardis
 
-# Run the TARDIS Simulation
-config_file_path = "../../tardis_example.yml"
-sim = run_tardis(config_file_path,
-                 virtual_packet_logging=True,
-                 show_convergence_plots=False,
-                 export_convergence_plots=False,
-                 log_level="ERROR")
-
-# Extract and Plot the Spectrum
-spectrum = sim.spectrum_solver.spectrum_real_packets
-spectrum_virtual = sim.spectrum_solver.spectrum_virtual_packets
-spectrum_integrated = sim.spectrum_solver.spectrum_integrated
-
 # Function to get Filter URL from TARDIS config file
 def get_url_from_config(config_file_path):
     
@@ -68,23 +55,24 @@ def check_filter(filter_name):
     else:
         return True
     
-# Main Execution
+
+# Main Execution #
 
 # Get URL and Filter Name from config file
 url_and_name = get_url_from_config('filter_config.yml')
 DownloadUrl = url_and_name[0]
 FilterName = url_and_name[1]
 
-# Download the filter file
-chosen_filter = download_filter(DownloadUrl, FilterName)
-
 # Check if the filter URL is valid. If not, remove the file and raise an error.
 if check_filter(FilterName) == True:
-    print("Filter URL is valid. Proceeding with filtering process.")
+    print("Filter URL is valid. Downloading filter file.")
 elif check_filter(FilterName) == False:
     print("Filter URL is not valid. Removing invalid filter file.")
     os.remove(f'Filters/{FilterName}.xml')
     raise ValueError("Invalid Filter URL. The filter file has been removed.")
+
+# Download the filter file
+chosen_filter = download_filter(DownloadUrl, FilterName)
 
 # Function to get wavelength and transmission values from filter file
 def get_filter(filter_name):
@@ -145,7 +133,3 @@ def plot_filtered_spectrum(spectrum, spectrum_virtual, spectrum_integrated, chos
     plt.xlim(500, 12000)
     plt.title("Filtered TARDIS Example Model Spectrum")
     plt.show()
-
-plot_original_spectrum(spectrum, spectrum_virtual, spectrum_integrated)
-plot_filter(spectrum, chosen_filter)
-plot_filtered_spectrum(spectrum, spectrum_virtual, spectrum_integrated, chosen_filter)
