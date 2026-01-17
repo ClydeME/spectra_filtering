@@ -44,36 +44,27 @@ def check_filter(filter_name):
         return True
     
 # Function to download the filter file
-def download_filter(url, filename):
-    req = requests.get(url, timeout = 10)
-
-    with open((f'Filters/{filename}.xml'), 'wb') as f:
-            
-        # Chunking to avoid large memory consumption
-        for chunk in req.iter_content(chunk_size=8192):
-            if chunk:
-                f.write(chunk)
+def download_filter(config_file_path='filter_config.yml'):
+    url, filename = get_url_from_config(config_file_path)
+    
+    # Check if the filter URL is valid. If not, remove the file and raise an error.
+    if check_filter(filename) == True:
+        print("Filter URL is valid. Downloading filter file.")
+        req = requests.get(url, timeout = 10)
         
-    return filename
+        with open((f'Filters/{filename}.xml'), 'wb') as f:
+            
+            # Chunking to avoid large memory consumption
+            for chunk in req.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
 
-# Main Execution #
+        return filename
 
-# Get URL and Filter Name from config file
-url_and_name = get_url_from_config('filter_config.yml')
-DownloadUrl = url_and_name[0]
-FilterName = url_and_name[1]
-
-# Download the filter file
-chosen_filter = download_filter(DownloadUrl, FilterName)
-
-# Check if the filter URL is valid. If not, remove the file and raise an error.
-if check_filter(FilterName) == True:
-    print("Filter URL is valid. Downloading filter file.")
-
-elif check_filter(FilterName) == False:
-    print("Invalid Filter.")
-    os.remove(f'Filters/{FilterName}.xml')
-    raise ValueError("Invalid Filter URL. Please check the filter configuration.")
+    else:
+        print("Invalid Filter URL.")
+        os.remove(f'Filters/{filename}.xml')
+        raise ValueError("Invalid Filter URL. Please check the filter configuration.")
 
 
 # Function to get wavelength and transmission values from filter file
