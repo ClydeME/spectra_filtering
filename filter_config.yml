@@ -1,4 +1,6 @@
+# Find filters at https://svo2.cab.inta-csic.es/theory/fps/
+
 filter:
   Telescope_Name: HST
   Instrument: ACS_HRC
-  Filter_ID: F330W
+  Filter_ID: F220W
