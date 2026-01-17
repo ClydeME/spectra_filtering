@@ -3,4 +3,4 @@
 filter:
   Telescope_Name: HST
   Instrument: ACS_HRC
-  Filter_ID: F435W
+  Filter_ID: F220W

@@ -34,6 +34,7 @@ def get_url_from_config(config_file_path):
 def check_filter(filter_name):
     
     root = et.parse(f"Filters/{filter_name}.xml")
+    
     info = root.find('INFO')
     check = info.get('value')
 
@@ -67,12 +68,12 @@ chosen_filter = download_filter(DownloadUrl, FilterName)
 
 # Check if the filter URL is valid. If not, remove the file and raise an error.
 if check_filter(FilterName) == True:
-    print("Filter URL is valid.")
+    print("Filter URL is valid. Downloading filter file.")
 
-else:
+elif check_filter(FilterName) == False:
     print("Invalid Filter.")
     os.remove(f'Filters/{FilterName}.xml')
-    raise ValueError("Invalid Filter URL. Removing downloaded file.")
+    raise ValueError("Invalid Filter URL. Please check the filter configuration.")
 
 
 # Function to get wavelength and transmission values from filter file
