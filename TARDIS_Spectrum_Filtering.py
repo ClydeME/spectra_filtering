@@ -1,8 +1,3 @@
-import faulthandler
-faulthandler.enable()
-
-
-from fileinput import filename
 import os
 import xml.etree.ElementTree as et
 import matplotlib.pyplot as plt
@@ -34,21 +29,20 @@ def get_url_from_config(config_file_path):
 def download_filter(url, filename):
     req = requests.get(url, timeout = 10)
 
-    # Check if the filter URL is valid. If not, remove the file and raise an error.
-    if check_filter(filename) == True:
-        print("Filter URL is valid. Proceeding with download...")
-        with open((f'Filters/{filename}.xml'), 'wb') as f:
+    with open((f'Filters/{filename}.xml'), 'wb') as f:
             
-            # Chunking to avoid large memory consumption
-            for chunk in req.iter_content(chunk_size=8192):
-                if chunk:
-                    f.write(chunk)
-        
-        return filename
+        # Chunking to avoid large memory consumption
+        for chunk in req.iter_content(chunk_size=8192):
+            if chunk:
+                f.write(chunk)
     
+    if check_filter(filename) == True:
+        print("Filter URL is valid.")
+        return filename
     elif check_filter(filename) == False:
-        print("Invalid Filter URL.")
-        raise ValueError("Invalid Filter URL.")
+        print("Filter URL is not valid. Removing invalid filter file.")
+        os.remove(f'Filters/{filename}.xml')
+        raise ValueError("Invalid Filter URL. The filter file has been removed.")
 
 # Function to check if the filter file is valid
 def check_filter(filter_name):
