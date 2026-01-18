@@ -2,6 +2,7 @@ import faulthandler
 faulthandler.enable()
 
 
+from fileinput import filename
 import os
 import xml.etree.ElementTree as et
 import matplotlib.pyplot as plt
@@ -9,9 +10,9 @@ import networkx as nx
 import numpy as np
 import requests
 import yaml
-from astropy import units as u
 from IPython.display import Image, display
 from tardis import run_tardis
+from astropy import units as u
 
 # Function to get Filter URL from TARDIS config file
 def get_url_from_config(config_file_path):
@@ -28,7 +29,26 @@ def get_url_from_config(config_file_path):
     url = f"https://svo2.cab.inta-csic.es/theory/fps/fps.php?ID={name}"
 
     return url, safe_name
+    
+# Function to download the filter file
+def download_filter(url, filename):
+    req = requests.get(url, timeout = 10)
 
+    # Check if the filter URL is valid. If not, remove the file and raise an error.
+    if check_filter(filename) == True:
+        print("Filter URL is valid. Proceeding with download...")
+        with open((f'Filters/{filename}.xml'), 'wb') as f:
+            
+            # Chunking to avoid large memory consumption
+            for chunk in req.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+        
+        return filename
+    
+    elif check_filter(filename) == False:
+        print("Invalid Filter URL.")
+        raise ValueError("Invalid Filter URL.")
 
 # Function to check if the filter file is valid
 def check_filter(filter_name):
@@ -36,43 +56,16 @@ def check_filter(filter_name):
     root = et.parse(f"Filters/{filter_name}.xml")
     
     info = root.find('INFO')
+
+    if info is None:
+        return False
+
     check = info.get('value')
 
     if check == 'ERROR':
         return False
     else:
         return True
-    
-# Function to download the filter file
-def download_filter(url, filename):
-    req = requests.get(url, timeout = 10)
-
-    with open((f'Filters/{filename}.xml'), 'wb') as f:
-            
-        # Chunking to avoid large memory consumption
-        for chunk in req.iter_content(chunk_size=8192):
-            if chunk:
-                f.write(chunk)
-        
-        return filename
-
-# Main Execution #
-
-# Get URL and Filter Name from config file
-url_and_name = get_url_from_config('filter_config.yml')
-DownloadUrl = url_and_name[0]
-FilterName = url_and_name[1]
-
-# Download the filter file
-chosen_filter = download_filter(DownloadUrl, FilterName)
-
-# Check if the filter URL is valid. If not, remove the file and raise an error.
-if check_filter(FilterName) == True:
-    print("Filter URL is valid. Downloading filter file.")
-elif check_filter(FilterName) == False:
-    print("Filter URL is not valid. Removing invalid filter file.")
-    os.remove(f'Filters/{FilterName}.xml')
-    raise ValueError("Invalid Filter URL. The filter file has been removed.")
 
 # Function to get wavelength and transmission values from filter file
 def get_filter(filter_name):
@@ -91,7 +84,8 @@ def get_filter(filter_name):
 # Function to interpolate filter to match TARDIS Spectrum
 def interp_filter(spectrum_to_filter, filter_name):
     #Interpolate filter transmission values to match TARDIS Spectrum
-    return np.interp(spectrum_to_filter, get_filter(filter_name)[0], get_filter(filter_name)[1])
+    wl, tr = get_filter(filter_name)
+    return np.interp(spectrum_to_filter, wl, tr)
 
 def plot_original_spectrum(spectrum, spectrum_virtual, spectrum_integrated):
     # Plot TARDIS Spectrum before filtering
