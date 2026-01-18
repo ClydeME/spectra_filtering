@@ -1,4 +1,4 @@
 filter:
-  Telescope_Name: HST
-  Instrument: ACS_HRC
-  Filter_ID: F330W
+  Telescope_Name: JWST
+  Instrument: NIRCam
+  Filter_ID: F070W

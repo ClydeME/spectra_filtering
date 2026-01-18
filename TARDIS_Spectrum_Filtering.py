@@ -24,7 +24,23 @@ def get_url_from_config(config_file_path):
     url = f"https://svo2.cab.inta-csic.es/theory/fps/fps.php?ID={name}"
 
     return url, safe_name
+
+# Function to check if the filter file is valid
+def check_filter(filter_name):
     
+    root = et.parse(f"Filters/{filter_name}.xml")
+    
+    info = root.find('INFO')
+
+    check = info.get('value')
+
+    if check == 'ERROR':
+        return False
+    elif info is None:
+        return False
+    else:
+        return True
+
 # Function to download the filter file
 def download_filter(url, filename):
     req = requests.get(url, timeout = 10)
@@ -43,23 +59,6 @@ def download_filter(url, filename):
         print("Filter URL is not valid. Removing invalid filter file.")
         os.remove(f'Filters/{filename}.xml')
         raise ValueError("Invalid Filter URL. The filter file has been removed.")
-
-# Function to check if the filter file is valid
-def check_filter(filter_name):
-    
-    root = et.parse(f"Filters/{filter_name}.xml")
-    
-    info = root.find('INFO')
-
-    if info is None:
-        return False
-
-    check = info.get('value')
-
-    if check == 'ERROR':
-        return False
-    else:
-        return True
 
 # Function to get wavelength and transmission values from filter file
 def get_filter(filter_name):
