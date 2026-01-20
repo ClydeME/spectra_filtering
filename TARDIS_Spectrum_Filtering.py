@@ -9,6 +9,7 @@ from IPython.display import Image, display
 from tardis import run_tardis
 from astropy import units as u
 
+
 # Function to get Filter URL from TARDIS config file
 def get_url_from_config(config_file_path):
     
@@ -25,6 +26,7 @@ def get_url_from_config(config_file_path):
 
     return url, safe_name
 
+
 # Function to check if the filter file is valid
 def check_filter(filter_name):
     
@@ -40,6 +42,7 @@ def check_filter(filter_name):
         return False
     else:
         return True
+
 
 # Function to download the filter file
 def download_filter(url, filename):
@@ -60,6 +63,7 @@ def download_filter(url, filename):
         os.remove(f'Filters/{filename}.xml')
         raise ValueError("Invalid Filter URL. The filter file has been removed.")
 
+
 # Function to get wavelength and transmission values from filter file
 def get_filter(filter_name):
     
@@ -74,12 +78,15 @@ def get_filter(filter_name):
     tr = all_vals[1::2]
     return wl, tr
 
+
 # Function to interpolate filter to match TARDIS Spectrum
 def interp_filter(spectrum_to_filter, filter_name):
     #Interpolate filter transmission values to match TARDIS Spectrum
     wl, tr = get_filter(filter_name)
     return np.interp(spectrum_to_filter, wl, tr)
 
+
+# Function to plot original TARDIS Spectrum
 def plot_original_spectrum(spectrum, spectrum_virtual, spectrum_integrated):
     # Plot TARDIS Spectrum before filtering
     plt.figure()
@@ -88,10 +95,10 @@ def plot_original_spectrum(spectrum, spectrum_virtual, spectrum_integrated):
     plt.plot(spectrum.wavelength, spectrum_integrated.luminosity_density_lambda)
     plt.xlabel("Wavelength (Angstrom)")
     plt.ylabel("Luminosity Density (erg/s/Angstrom)")
-    plt.xlim(500, 12000)
-    plt.title("Unfiltered TARDIS Example Model Spectrum")
+    plt.title("Unfiltered TARDIS Spectrum")
 
 
+# Function to plot filter transmission curve
 def plot_filter(spectrum, chosen_filter):
     
     # Interpolate filter transmission values to match TARDIS Spectrum
@@ -103,9 +110,9 @@ def plot_filter(spectrum, chosen_filter):
     plt.title("Filter Transmission Curve")
     plt.xlabel("Wavelength (Angstrom)")
     plt.ylabel("Transmission")
-    plt.xlim(500, 12000)
 
 
+# Function to apply the chosen filter and plot the filtered spectrum
 def plot_filtered_spectrum(spectrum, spectrum_virtual, spectrum_integrated, chosen_filter):
     # Interpolate filter transmission values to match TARDIS Spectrum
     prepared_filter = interp_filter(spectrum.wavelength, chosen_filter)
@@ -117,6 +124,5 @@ def plot_filtered_spectrum(spectrum, spectrum_virtual, spectrum_integrated, chos
     plt.plot(spectrum.wavelength, spectrum_integrated.luminosity_density_lambda * prepared_filter)
     plt.xlabel("Wavelength (Angstrom)")
     plt.ylabel("Luminosity Density (erg/s/Angstrom)")
-    plt.xlim(500, 12000)
     plt.title("Filtered TARDIS Example Model Spectrum")
     plt.show()
