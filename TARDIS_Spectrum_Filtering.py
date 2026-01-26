@@ -6,7 +6,6 @@ import requests
 import yaml
 from astropy import units as u
 
-
 # Function to get Filter URL from TARDIS config file
 def get_url_from_config(config_file_path):
     

@@ -1,3 +1,4 @@
 Filters/
-filter_config.yml
-__pycache__/TARDIS_Spectrum_Filtering.cpython-313.pyc
+TARDIS_Spectrum_Filtering.egg-info/
+__pycache__/
+dist/
